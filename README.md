@@ -18,6 +18,20 @@
 |3|将步骤2中的字符串，前面拼接请求方法，后面拼接 &密钥串 |
 |4|将步骤3中得到的字符串进行MD5，即可得到sign|
 
+~~~
+    function create_url($params,$method){
+        $secretkey = '123456798';
+        $url = "http://www.webapi.com/Interface/Classes/getClassInfo?";
+        ksort($params);
+        $str = "";
+        foreach($params as $key => $val){
+            $str .= "&" . $key . "=" . urlencode($val);
+        }
+        $sign = MD5($method . $str . "&" . $secretkey);
+        $url .= $str . "&sign=" . $sign;
+        return $url;
+    }
+~~~
 
 <h2>API列表</h2>
 
