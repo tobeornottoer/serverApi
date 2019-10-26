@@ -18,6 +18,7 @@
 |3|将步骤2中的字符串，前面拼接请求方法，后面拼接 &密钥串 |
 |4|将步骤3中得到的字符串进行MD5，即可得到sign|
 
+生成请求URL的方法如下：
 ~~~
     function create_url($params,$method){
         $secretkey = '123456798';
