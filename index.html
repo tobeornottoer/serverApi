@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>调试API</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="./layui/css/layui.css"  media="all">
+  <style type="text/css">
+  	.layui-form-label{
+  		width: 180px;
+  	}
+  	.layui-input{
+  		width:70%;
+  	}
+  	.layui-select-title .layui-input{
+  		width:100%;
+  	}
+  	.param-form{
+  		display: none;
+  	}
+  	.submit{
+  		position: fixed;bottom: 0;left:0;text-align: center;display: block;right:0;margin:0;padding:0;
+  	}
+    pre {outline: 1px solid aliceblue; padding: 5px; margin: 5px; }
+    .string { color: green; }
+    .number { color: darkorange; }
+    .boolean { color: blue; }
+    .null { color: magenta; }
+    .key { color: red; }
+    #result{background: aliceblue;}
+  </style>
+</head>
+<body>
+        
+<blockquote class="layui-elem-quote layui-text">
+  API调试工具<a href="https://github.com/tobeornottoer/serverApi" target="_blank">API文档</a> 
+</blockquote>  
+              
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+  <legend>开放API调试</legend>
+</fieldset>
+ 
+<form class="layui-form" action="">
+  
+  <div class="layui-form-item">
+    <div class="layui-inline">
+      <label class="layui-form-label">选择接口</label>
+      <div class="layui-input-inline">
+        <select name="quiz" lay-filter="interface">
+          <option value="">选择接口</option>
+          <optgroup label="账号">
+            <option value="Interface/User/add?" select-form="User_add"  select-form="User_add" request_method="POST">添加学生账号</option>
+            <option value="Interface/User/del?"  select-form="User_del" request_method="POST">删除学生账号</option>
+            <option value="Interface/User/updatePasswd?"  select-form="User_updatePasswd" request_method="POST">修改学生密码</option>
+            <option value="Interface/User/updateStudent?"  select-form="User_updateStudent" request_method="POST">修改学生信息</option>
+            <option value="Interface/User/getStudentInfo?"  select-form="User_getStudentInfo" request_method="GET">查询学生信息</option>
+          </optgroup>
+          <optgroup label="录播课程">
+            <option value="Interface/Course/uploadCover?"  select-form="Course_uploadCover" request_method="POST">上传课程封面</option>
+            <option value="Interface/Course/create?"  select-form="Course_create" request_method="POST">创建课程</option>
+            <option value="Interface/Course/update?"  select-form="Course_update" request_method="POST">修改课程</option>
+            <option value="Interface/Course/del?"  select-form="Course_del" request_method="POST">下架课程/删除课程</option>
+            <option value="Interface/Course/getCourseInfo?"  select-form="Course_getCourseInfo" request_method="GET">查询课程信息</option>
+            <option value="Interface/Course/getList?"  select-form="nothing" request_method="GET">获取课程列表</option>
+          </optgroup>
+          <optgroup label="班级">
+            <option value="Interface/Classes/join?"  select-form="Classes_join" request_method="POST">添加班级学生</option>
+            <option value="Interface/Classes/remove?"  select-form="Classes_remove" request_method="POST">移除班级学生</option>
+            <option value="Interface/Classes/batch?"  select-form="Classes_batch" request_method="POST">批量添加/移除班级学生</option>
+            <option value="Interface/Classes/getClassInfo?"  select-form="Classes_getClassInfo" request_method="GET">查询班级信息</option>
+            <option value="Interface/Classes/getClassList?"  select-form="nothing" request_method="GET">获取班级列表</option>
+          </optgroup>
+          <optgroup label="录播授权">
+            <option value="Interface/Authorization/add?"  select-form="Authorization_add" request_method="POST">添加授权</option>
+            <option value="Interface/Authorization/remove?"  select-form="Authorization_remove" request_method="POST">取消授权</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+  </div>
+</form>
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+  <legend>秘钥参数</legend>
+</fieldset>
+
+<form class="layui-form" id="secret">
+	<div class="layui-form-item">
+		<label class="layui-form-label">secretKey<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="secretKey" lay-verify="secretKey" autocomplete="off" placeholder="secretKey" class="layui-input">
+	    </div>
+  	</div>
+</form>
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+  <legend>公共参数</legend>
+</fieldset>
+
+<form class="layui-form" id="public">
+	<div class="layui-form-item">
+		<label class="layui-form-label">AccessKey<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="AccessKey" lay-verify="AccessKey" autocomplete="off" placeholder="AccessKey" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">version<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="version" lay-verify="version" autocomplete="off" placeholder="version" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+  		<label class="layui-form-label">timeStamp</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="timeStamp" lay-verify="timeStamp" disabled="" autocomplete="off" placeholder="timeStamp" class="layui-input layui-disabled">
+	    </div>
+  	</div>
+	<div class="layui-form-item">
+  		<label class="layui-form-label">sign</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="sign" lay-verify="sign" disabled="" autocomplete="off" placeholder="sign" class="layui-input layui-disabled">
+	    </div>
+  	</div>
+</form>
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+  <legend>请求参数</legend>
+</fieldset>
+<!-- 添加学生账号 -->
+<form class="layui-form param-form" id="User_add">
+	<div class="layui-form-item">
+		<label class="layui-form-label">stuName<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="stuName" lay-verify="stuName" autocomplete="off" placeholder="学生账号" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">phone</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="phone" lay-verify="phone" autocomplete="off" placeholder="手机号码" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">passwd<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="passwd" lay-verify="passwd" autocomplete="off" placeholder="密码，6到20位数字、字母、下划线组合" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">deviceNum<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="deviceNum" lay-verify="deviceNum" autocomplete="off" placeholder="绑定设备数，最大值10" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">expirationDate<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="expirationDate" lay-verify="expirationDate" autocomplete="off" placeholder="到期时间，例如：20200101" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">platform<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="platform" lay-verify="platform" autocomplete="off" placeholder="授权登录的设备类型，Windows:1 安卓:2 苹果:4 Mac:8,用;号分隔，例如：（1;2;4;8;）" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">realName</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="realName" lay-verify="realName" autocomplete="off" placeholder="姓名" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">age</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="age" lay-verify="age" autocomplete="off" placeholder="年龄" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">qq</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="qq" lay-verify="qq" autocomplete="off" placeholder="qq" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">gender</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="gender" lay-verify="gender" autocomplete="off" placeholder="1男2女0未知" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">remark</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="remark" lay-verify="remark" autocomplete="off" placeholder="备注信息" class="layui-input">
+	    </div>
+  	</div>
+</form>
+<!-- 删除学生账号 -->
+<form class="layui-form param-form" id="User_del">
+	<div class="layui-form-item">
+		<label class="layui-form-label">stuName<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="stuName" lay-verify="stuName" autocomplete="off" placeholder="学生账号" class="layui-input">
+	    </div>
+  	</div>
+</form>
+<!-- 修改学生密码 -->
+<form class="layui-form param-form" id="User_updatePasswd">
+	<div class="layui-form-item">
+		<label class="layui-form-label">stuName<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="stuName" lay-verify="stuName" autocomplete="off" placeholder="学生账号" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">newPasswd<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="newPasswd" lay-verify="newPasswd" autocomplete="off" placeholder="新密码" class="layui-input">
+	    </div>
+  	</div>
+</form>
+<!-- 修改学生信息 -->
+<form class="layui-form param-form" id="User_updateStudent">
+	<div class="layui-form-item">
+		<label class="layui-form-label">stuName<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="stuName" lay-verify="stuName" autocomplete="off" placeholder="学生账号" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">phone</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="phone" lay-verify="phone" autocomplete="off" placeholder="手机号码" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">deviceNum</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="deviceNum" lay-verify="deviceNum" autocomplete="off" placeholder="绑定设备数，最大值10" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">expirationDate</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="expirationDate" lay-verify="expirationDate" autocomplete="off" placeholder="到期时间，例如：20200101" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">platform</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="platform" lay-verify="platform" autocomplete="off" placeholder="授权登录的设备类型，Windows:1 安卓:2 苹果:4 Mac:8,用;号分隔，例如：（1;2;4;8;）" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">realName</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="realName" lay-verify="realName" autocomplete="off" placeholder="姓名" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">age</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="age" lay-verify="age" autocomplete="off" placeholder="年龄" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">qq</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="qq" lay-verify="qq" autocomplete="off" placeholder="qq" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">gender</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="gender" lay-verify="gender" autocomplete="off" placeholder="1男2女0未知" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">remark</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="remark" lay-verify="remark" autocomplete="off" placeholder="备注信息" class="layui-input">
+	    </div>
+  	</div>
+</form>
+<!-- 查询学生信息 -->
+<form class="layui-form param-form" id="User_getStudentInfo">
+	<div class="layui-form-item">
+		<label class="layui-form-label">stuName<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="stuName" lay-verify="stuName" autocomplete="off" placeholder="学生账号" class="layui-input">
+	    </div>
+  	</div>
+</form>
+<!-- 上传课程封面 -->
+<form class="layui-form param-form" id="Course_uploadCover">
+	<div class="layui-form-item">
+		<label class="layui-form-label">file<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="file" name="file" lay-verify="file" autocomplete="off" placeholder="file" class="layui-input">
+	    </div>
+  	</div>
+</form>
+<!-- 创建课程 -->
+<form class="layui-form param-form" id="Course_create">
+	<div class="layui-form-item">
+		<label class="layui-form-label">courseName<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="courseName" lay-verify="courseName" autocomplete="off" placeholder="课程名称" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">cover<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="cover" lay-verify="cover" autocomplete="off" placeholder="封面ID，可从《上传封面》接口中获取" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">popularity<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="popularity" lay-verify="popularity" autocomplete="off" placeholder="课程基础人气值，显示的人气值=基础人气+购买人数" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">price<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="price" lay-verify="price" autocomplete="off" placeholder="课程价格" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">intro<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="intro" lay-verify="intro" autocomplete="off" placeholder="课程简介，字符长度不得大于10000" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">playAccess</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="playAccess" lay-verify="playAccess" autocomplete="off" placeholder="允许在线播放,默认0" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">downloadAccess</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="downloadAccess" lay-verify="downloadAccess" autocomplete="off" placeholder="允许下载,默认0" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">isTop</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="isTop" lay-verify="isTop" autocomplete="off" placeholder="是否为精选课程,默认0" class="layui-input">
+	    </div>
+  	</div>
+</form>     
+<!-- 修改课程 -->
+<form class="layui-form param-form" id="Course_update">
+	<div class="layui-form-item">
+		<label class="layui-form-label">courseId<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="courseId" lay-verify="courseId" autocomplete="off" placeholder="课程ID" class="layui-input">
+	    </div>
+  	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">courseName</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="courseName" lay-verify="courseName" autocomplete="off" placeholder="课程名称" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">cover</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="cover" lay-verify="cover" autocomplete="off" placeholder="封面ID，可从《上传封面》接口中获取" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">popularity</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="popularity" lay-verify="popularity" autocomplete="off" placeholder="课程基础人气值，显示的人气值=基础人气+购买人数" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">price</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="price" lay-verify="price" autocomplete="off" placeholder="课程价格" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">intro</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="intro" lay-verify="intro" autocomplete="off" placeholder="课程简介，字符长度不得大于10000" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">playAccess</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="playAccess" lay-verify="playAccess" autocomplete="off" placeholder="允许在线播放,默认0" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">downloadAccess</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="downloadAccess" lay-verify="downloadAccess" autocomplete="off" placeholder="允许下载,默认0" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">isTop</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="isTop" lay-verify="isTop" autocomplete="off" placeholder="是否为精选课程,默认0" class="layui-input">
+	    </div>
+  	</div>
+</form>    
+<!-- 下架课程 -->
+<form class="layui-form param-form" id="Course_del">
+	<div class="layui-form-item">
+		<label class="layui-form-label">courseId<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="courseId" lay-verify="courseId" autocomplete="off" placeholder="课程ID" class="layui-input">
+	    </div>
+  	</div>
+</form>   
+<!-- 查询课程信息 -->
+<form class="layui-form param-form" id="Course_getCourseInfo">
+	<div class="layui-form-item">
+		<label class="layui-form-label">courseId<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="courseId" lay-verify="courseId" autocomplete="off" placeholder="课程ID" class="layui-input">
+	    </div>
+  	</div>
+</form>
+<!-- 添加班级的学生 -->
+<form class="layui-form param-form" id="Classes_join">
+	<div class="layui-form-item">
+		<label class="layui-form-label">classId<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="classId" lay-verify="classId" autocomplete="off" placeholder="班级ID" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">stuName<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="stuName" lay-verify="stuName" autocomplete="off" placeholder="学生账号" class="layui-input">
+	    </div>
+  	</div>
+</form>
+<!-- 移除班级的学生 -->
+<form class="layui-form param-form" id="Classes_remove">
+	<div class="layui-form-item">
+		<label class="layui-form-label">classId<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="classId" lay-verify="classId" autocomplete="off" placeholder="班级ID" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">stuName<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="stuName" lay-verify="stuName" autocomplete="off" placeholder="学生账号" class="layui-input">
+	    </div>
+  	</div>
+</form>
+<!-- 批量操作 -->
+<form class="layui-form param-form" id="Classes_batch">
+	<div class="layui-form-item">
+		<label class="layui-form-label">classId<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="classId" lay-verify="classId" autocomplete="off" placeholder="班级ID" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">action<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="action" lay-verify="action" autocomplete="off" placeholder="join/remove" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">stuName<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="stuName" lay-verify="stuName" autocomplete="off" placeholder="学生账号" class="layui-input">
+	    </div>
+  	</div>
+</form>
+<!-- 查询班级信息 -->
+<form class="layui-form param-form" id="Classes_getClassInfo">
+	<div class="layui-form-item">
+		<label class="layui-form-label">classId<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="classId" lay-verify="classId" autocomplete="off" placeholder="班级ID" class="layui-input">
+	    </div>
+  	</div>
+</form>
+<!-- 录播授权 -->
+<form class="layui-form param-form" id="Authorization_add">
+	<div class="layui-form-item">
+		<label class="layui-form-label">stuName<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="stuName" lay-verify="stuName" autocomplete="off" placeholder="学生账号" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">courseId<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="courseId" lay-verify="courseId" autocomplete="off" placeholder="课程ID,限制长度255,多个课程请用英文逗号作间隔如 100,101,102。(字符串'0'代表授权全部课程" class="layui-input">
+	    </div>
+  	</div>
+</form>
+<!-- 取消授权 -->
+<form class="layui-form param-form" id="Authorization_remove">
+	<div class="layui-form-item">
+		<label class="layui-form-label">stuName<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="stuName" lay-verify="stuName" autocomplete="off" placeholder="学生账号" class="layui-input">
+	    </div>
+  	</div>
+  	<div class="layui-form-item">
+		<label class="layui-form-label">courseId<span class="layui-badge-dot layui-bg-orange"></span></label>
+	    <div class="layui-input-block">
+	      <input type="text" name="courseId" lay-verify="courseId" autocomplete="off" placeholder="课程ID,限制长度255,多个课程请用英文逗号作间隔如 100,101,102。不传该参数将会取消所有授权，请谨慎操作" class="layui-input">
+	    </div>
+  	</div>
+</form>
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+  <legend>响应</legend>
+</fieldset>
+
+<pre id="result">
+</pre>
+
+<div style="width:100%;height:60px;"></div>
+<blockquote class="layui-elem-quote layui-text submit">
+  <button type="button" class="layui-btn" id="send" style="margin: 10px;">发送请求</button>
+</blockquote>
+
+<script src="./layui/layui.js" charset="utf-8"></script>
+<script src="./layui/md5.js" charset="utf-8"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+var API = '';
+var FORM = '';
+var METHOD = '';
+var HOST = "http://www.webapi.com/";
+var SIGN = "";
+var TIMESTAMP = "";
+layui.use(['form'], function(){
+  var form = layui.form;
+  form.on('select(interface)', function(data){
+  		API = data.value;
+  		METHOD = $(data.elem[data.elem.selectedIndex]).attr("request_method");
+  	 	var itemArr = data.value.split("/");
+  	 	var ids = itemArr[1]+"_"+itemArr[2].replace("?","");
+  	 	$(".param-form").hide(); 
+  	 	$("#"+ids).show();
+  	 	FORM = "#"+ids;
+  	 	$('#result').html(syntaxHighlight(""));
+  });                          
+  
+});
+</script>
+
+</body>
+</html>
+<script
+  src="https://code.jquery.com/jquery-3.4.1.js"
+  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+  crossorigin="anonymous"></script>
+<script type="text/javascript">
+	$("#send").click(function(){
+		request();
+	});
+
+	function request(){
+		var params = new Array();
+		if($("input[name='secretKey']").val() == '') return alert("secretKey未填写");
+		params["AccessKey"] = $("input[name='AccessKey']").val();
+		if(params["AccessKey"] == '') return alert("AccessKey未填写");
+		params['version'] = $("input[name='version']").val();
+		if(params["version"] == '') return alert("version未填写");
+		params["timeStamp"] = Date.parse(new Date()) / 1000;
+		switch(API){
+			case "Interface/User/add?":{
+				params["stuName"] = $(FORM+" input[name='stuName']").val();
+				params["phone"] = $(FORM+" input[name='phone']").val();
+				params["passwd"] = $(FORM+" input[name='passwd']").val();
+				params["deviceNum"] = $(FORM+" input[name='deviceNum']").val();
+				params["expirationDate"] = $(FORM+" input[name='expirationDate']").val();
+				params["platform"] = $(FORM+" input[name='platform']").val();
+				params["realName"] = $(FORM+" input[name='realName']").val();
+				params["age"] = $(FORM+" input[name='age']").val();
+				params["qq"] = $(FORM+" input[name='qq']").val();
+				params["gender"] = $(FORM+" input[name='gender']").val();
+				params["remark"] = $(FORM+" input[name='remark']").val();
+			};break;
+			case "Interface/User/del?":{
+				params["stuName"] = $(FORM+" input[name='stuName']").val();
+			};break;
+			case "Interface/User/updatePasswd?":{
+				params["stuName"] = $(FORM+" input[name='stuName']").val();
+				params["newPasswd"] = $(FORM+" input[name='newPasswd']").val();
+			};break;
+			case "Interface/User/updateStudent?":{
+				params["stuName"] = $(FORM+" input[name='stuName']").val();
+				params["phone"] = $(FORM+" input[name='phone']").val();
+				params["deviceNum"] = $(FORM+" input[name='deviceNum']").val();
+				params["expirationDate"] = $(FORM+" input[name='expirationDate']").val();
+				params["platform"] = $(FORM+" input[name='platform']").val();
+				params["realName"] = $(FORM+" input[name='realName']").val();
+				params["age"] = $(FORM+" input[name='age']").val();
+				params["qq"] = $(FORM+" input[name='qq']").val();
+				params["gender"] = $(FORM+" input[name='gender']").val();
+				params["remark"] = $(FORM+" input[name='remark']").val();
+			};break;
+			case "Interface/User/getStudentInfo?":{
+				params["stuName"] = $(FORM+" input[name='stuName']").val();
+			};break;
+			case "Interface/Course/uploadCover?":{
+				//上传图片
+			};break;
+			case "Interface/Course/create?":{
+				params["courseName"] = $(FORM+" input[name='courseName']").val();
+				params["cover"] = $(FORM+" input[name='cover']").val();
+				params["popularity"] = $(FORM+" input[name='popularity']").val();
+				params["price"] = $(FORM+" input[name='price']").val();
+				params["intro"] = $(FORM+" input[name='intro']").val();
+				params["playAccess"] = $(FORM+" input[name='playAccess']").val();
+				params["downloadAccess"] = $(FORM+" input[name='downloadAccess']").val();
+				params["isTop"] = $(FORM+" input[name='isTop']").val();
+			};break;
+			case "Interface/Course/update?":{
+				params["courseId"] = $(FROM+" input[name='courseId']").val();
+				params["courseName"] = $(FORM+" input[name='courseName']").val();
+				params["cover"] = $(FORM+" input[name='cover']").val();
+				params["popularity"] = $(FORM+" input[name='popularity']").val();
+				params["price"] = $(FORM+" input[name='price']").val();
+				params["intro"] = $(FORM+" input[name='intro']").val();
+				params["playAccess"] = $(FORM+" input[name='playAccess']").val();
+				params["downloadAccess"] = $(FORM+" input[name='downloadAccess']").val();
+				params["isTop"] = $(FORM+" input[name='isTop']").val();
+			};break;
+			case "Interface/Course/del?":{
+				params["courseId"] = $(FROM+" input[name='courseId']").val();
+			};break;
+			case "Interface/Course/getCourseInfo?":{
+				params["courseId"] = $(FROM+" input[name='courseId']").val();
+			};break;
+			case "Interface/Course/getList?":{
+
+			};break;
+			case "Interface/Classes/join?":{
+				params["classId"] = $(FROM+" input[name='classId']").val();
+				params["stuName"] = $(FROM+" input[name='stuName']").val();
+			};break;
+			case "Interface/Classes/remove?":{
+				params["classId"] = $(FROM+" input[name='classId']").val();
+				params["stuName"] = $(FROM+" input[name='stuName']").val();
+			};break;
+			case "Interface/Classes/batch?":{
+				params["classId"] = $(FROM+" input[name='classId']").val();
+				params["action"] = $(FROM+" input[name='action']").val();
+				params["stuName"] = $(FROM+" input[name='stuName']").val();
+			};break;
+			case "Interface/Classes/getClassInfo?":{
+				params["classId"] = $(FROM+" input[name='classId']").val();
+			};break;
+			case "Interface/Classes/getClassList?":{
+
+			};break;
+			case "Interface/Authorization/add?":{
+				params["stuName"] = $(FROM+" input[name='stuName']").val();
+				params["courseId"] = $(FROM+" input[name='courseId']").val();
+			};break;
+			case "Interface/Authorization/remove?":{
+				params["stuName"] = $(FROM+" input[name='stuName']").val();
+				params["courseId"] = $(FROM+" input[name='courseId']").val();
+			};break;
+			default:return alert("请先选择需要调试的接口");
+		}
+		var url = getSign(params);
+		showtloading();
+		showTimeAndSign(params["timeStamp"],SIGN);
+		send(url,"");
+	}
+
+	function getSign(data){
+		var secretKey = $("input[name='secretKey']").val();
+		var requestHost = HOST + API;
+		var arrayKeys = Object.keys(data).sort();
+		var uri = "";
+		for(var key in arrayKeys){
+			uri += "&" + arrayKeys[key] + "=" + encodeURIComponent(data[arrayKeys[key]]);
+		}
+		var sign = hex_md5(METHOD + uri + "&" + secretKey);
+		SIGN = sign;
+		return requestHost + uri + "&sign=" + sign;
+	}
+
+	function send(url,data){
+		$.ajax({
+			url:url,
+			dataType:'json',
+			async:true,
+			data:data,
+			type:METHOD,
+			timeout:2000,
+			success:function(res){
+				$('#result').html(syntaxHighlight(res));
+			},
+			error:function(res){
+				var result = {};
+				result.error = "请求出错";
+				result.code = 500;
+				$('#result').html(syntaxHighlight(result));
+			}
+		});
+	}
+
+	function showtloading(){
+		var loading = {};
+		loading.status = "正在请求，请稍后...";
+		$('#result').html(syntaxHighlight(loading));
+	}
+
+	function showTimeAndSign(timeStamp,sign){
+		$("input[name='timeStamp']").val(timeStamp);
+		$("input[name='sign']").val(sign);
+	}
+
+	function syntaxHighlight(json) {
+    if (typeof json != 'string') {
+        json = JSON.stringify(json, undefined, 2);
+    }
+    json = json.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(match) {
+        var cls = 'number';
+        if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+                cls = 'key';
+            } else {
+                cls = 'string';
+            }
+        } else if (/true|false/.test(match)) {
+            cls = 'boolean';
+        } else if (/null/.test(match)) {
+            cls = 'null';
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+    });
+}
+
+
+</script>
